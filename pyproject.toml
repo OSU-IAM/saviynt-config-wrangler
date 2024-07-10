@@ -10,7 +10,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "saviynt-config-wrangler"
-version = "1.0.0"
+version = "1.0.2"
 authors = [
     { name="Oregon State University - IAM", email="iamteam@oregonstate.edu" },
 ]

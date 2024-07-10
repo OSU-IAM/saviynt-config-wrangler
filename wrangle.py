@@ -8,7 +8,6 @@ advantage@oregonstate.edu
 """
 
 import argparse
-import datetime
 import json
 import logging
 import lxml
@@ -79,12 +78,10 @@ def main():
     # Read the file we got, setup dependent vars
     if args.input_filename.endswith(".html"):
         connections = [wrangler.parse_config_from_html_file(args.input_filename)]
-        export_timestamp = "not available (manual export via HTML scrape)"
     else:
         # .zip export is parsed into an object
         export = wrangler.ConfigExport(zipfile_path=args.input_filename)
         connections = export.connections.values()
-        export_timestamp = export.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     # Loop over connections:
     # 1. Calculate header info
@@ -94,8 +91,6 @@ def main():
         # Build up a string, `output`, containing headers and config info
         output = (
             f"# Connector configuration - {connection.name.strip()} ({args.env})\n\n"
-            f"{'Exported:':<12}{str(export_timestamp)}\n"
-            f"{'Generated:':<12}{datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')}\n\n"
         )
 
         # Loop over connection attributes:
