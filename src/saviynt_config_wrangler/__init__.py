@@ -250,6 +250,7 @@ class ConfigExport:
                         "SERVICE_ACCOUNT_KEY_JSON",
                         "SSH_KEY",
                         "ConnectionJSON",
+                        "CONNECTIONJSON",
                     ]
 
                     # Make a connection object for each entry
