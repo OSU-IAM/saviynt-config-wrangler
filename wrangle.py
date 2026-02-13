@@ -4,16 +4,16 @@
 Copyright 2023 Oregon State University.  All Rights Reserved.
 
 Requests for more information can be directed to iamteam@oregonstate.edu |
-advantage@oregonstate.edu 
+advantage@oregonstate.edu
 """
 
 import argparse
 import json
 import logging
-import lxml
 import os
 import re
 
+import lxml
 import sqlparse
 
 import saviynt_config_wrangler as wrangler
@@ -91,6 +91,8 @@ def main():
         # Build up a string, `output`, containing headers and config info
         output = (
             f"# Connector configuration - {connection.name.strip()} ({args.env})\n\n"
+            + f"Description: {connection.description.strip()}\n\n"
+            + f"Connection Type: {connection.externalconnectiontype}\n\n"
         )
 
         # Loop over connection attributes:
@@ -121,14 +123,22 @@ def main():
                             wrangler.extract_code_snippets_from_json(value, [name])
                         )
                     # XML
-                    if outer_lang == 'xml':
-                        tree = lxml.etree.fromstring(value, parser = lxml.etree.XMLParser(strip_cdata=False))
-                        sql = tree.xpath('.//sql-query/text()')
+                    if outer_lang == "xml":
+                        tree = lxml.etree.fromstring(
+                            value, parser=lxml.etree.XMLParser(strip_cdata=False)
+                        )
+                        sql = tree.xpath(".//sql-query/text()")
                         for statement in sql:
-                            if statement.strip() == '':
+                            if statement.strip() == "":
                                 continue
-                            if wrangler.determine_outer_language(statement) == 'sql':
-                                embedded_code_blocks.update({f'{name}->sql-query': sqlparse.format(statement, reindent=True)})
+                            if wrangler.determine_outer_language(statement) == "sql":
+                                embedded_code_blocks.update(
+                                    {
+                                        f"{name}->sql-query": sqlparse.format(
+                                            statement, reindent=True
+                                        )
+                                    }
+                                )
                 except Exception as e:
                     logger.warning(
                         "Failed parsing embedded code blocks, message was: %s", e

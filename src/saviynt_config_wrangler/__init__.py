@@ -3,8 +3,9 @@
 Copyright 2023 Oregon State University.  All Rights Reserved.
 
 Requests for more information can be directed to iamteam@oregonstate.edu |
-advantage@oregonstate.edu 
+advantage@oregonstate.edu
 """
+
 import dataclasses
 import datetime
 import json
@@ -40,7 +41,7 @@ def determine_outer_language(lang_text):
     # SQL starts with DML keywords
     for keyword in ["SELECT", "UPDATE", "INSERT", "DELETE", "ALTER"]:
         if lang_text.startswith(keyword):
-            return 'sql'
+            return "sql"
 
     # XML is easy to spot amongst these others
     if lang_text.startswith("<"):
@@ -198,6 +199,7 @@ class Connection:
     attributes: dict
     status: bool = True
     description: str = None
+    externalconnectiontype: str = None
     timestamp: datetime = None
 
 
@@ -260,6 +262,9 @@ class ConfigExport:
                             "description": connections[connection_name][
                                 "connectiondescription"
                             ],
+                            "externalconnectiontype": connections[connection_name][
+                                "externalconnectiontype"
+                            ],
                             "status": bool(connections[connection_name]["status"]),
                             "timestamp": self.timestamp,
                             "attributes": {},
@@ -297,7 +302,7 @@ def parse_config_from_html_file(filename):
     """
 
     # Init a BeautifulSoup object with the contents of filename.
-    with open(filename, "r", encoding='utf-8') as html:
+    with open(filename, "r", encoding="utf-8") as html:
         soup = BeautifulSoup(html, "html.parser")
 
     # Get connection name
