@@ -60,9 +60,15 @@ def format_snippet(lang, snippet):
 
         case "json":
             preprocessed = snippet.replace("\n", "")
-            return json.dumps(
-                json.loads(preprocessed, strict=False), sort_keys=True, indent=4
-            )
+            try:
+                return json.dumps(
+                    json.loads(preprocessed, strict=False), sort_keys=True, indent=4
+                )
+            except json.JSONDecodeError:
+                # The value contains Groovy template syntax (e.g. \' escape
+                # sequences) that Saviynt evaluates before treating the result
+                # as JSON. Return verbatim so it can be pasted back unchanged.
+                return snippet
 
         case "sql":
             return sqlparse.format(snippet, reindent=True, keyword_case="upper")
@@ -182,8 +188,15 @@ def extract_code_snippets_from_json(json_str, name, path_sep="->"):
         # Return
         return code_found
 
-    # Load json_str -> json_tree
-    json_tree = json.loads(json_str)
+    # Load json_str -> json_tree.
+    # If parsing fails, retry after fixing Groovy \' escape sequences — these
+    # are invalid in JSON but are evaluated by Saviynt's Groovy engine before
+    # the result is parsed as JSON. The fix is applied only for extraction;
+    # the main code block is always output verbatim.
+    try:
+        json_tree = json.loads(json_str)
+    except json.JSONDecodeError:
+        json_tree = json.loads(json_str.replace("\\'", "\\\\'"))
     extract = process_json_tree(json_tree, name)
     return extract
 
