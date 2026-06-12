@@ -20,5 +20,6 @@ requires-python = ">=3.7"
 dependencies = [
   "bs4",
   "lxml",
+  "openpyxl",
   "sqlparse",
 ]
